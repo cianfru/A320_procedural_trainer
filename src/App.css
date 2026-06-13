@@ -1,0 +1,308 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  padding: 12px;
+  gap: 12px;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 18px;
+  letter-spacing: 0.5px;
+}
+
+.disclaimer {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: #ffb020;
+}
+
+.app-body {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+/* ── Control panel ─────────────────────────────────────────── */
+.control-panel {
+  width: 220px;
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: #11161f;
+  border: 1px solid #1e2733;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.cp-section h3 {
+  margin: 0 0 8px;
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: #7b879b;
+}
+
+.cp-section button {
+  display: block;
+  width: 100%;
+  margin-bottom: 6px;
+  padding: 7px 8px;
+  font-size: 12px;
+  background: #1b2430;
+  color: #e6e9ef;
+  border: 1px solid #2a3543;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.cp-section button:hover {
+  background: #243042;
+}
+
+.cp-row {
+  display: flex;
+  gap: 6px;
+}
+
+.cp-row button {
+  flex: 1;
+}
+
+.cp-clock {
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  color: #9fb0c3;
+  margin-bottom: 8px;
+}
+
+/* ── Display grid ──────────────────────────────────────────── */
+.displays-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.display {
+  background: #000;
+  border: 1px solid #1e2733;
+  border-radius: 8px;
+  padding: 12px;
+  min-height: 240px;
+  font-variant-numeric: tabular-nums;
+}
+
+.display-title {
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: #6b7688;
+  margin-bottom: 10px;
+}
+
+.display-stub {
+  margin-top: 16px;
+  font-size: 12px;
+  color: #4a5666;
+  font-style: italic;
+}
+
+/* ── PFD ───────────────────────────────────────────────────── */
+.pfd-readout {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pfd-field {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.pfd-label {
+  width: 48px;
+  color: #00e0e0;
+  font-size: 12px;
+}
+
+.pfd-value {
+  font-size: 22px;
+  color: #00ff66;
+}
+
+.pfd-unit {
+  font-size: 11px;
+  color: #6b7688;
+}
+
+/* ── E/WD ──────────────────────────────────────────────────── */
+.ewd-engines {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.engine-col {
+  text-align: center;
+}
+
+.engine-label {
+  color: #00e0e0;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.engine-val {
+  font-size: 20px;
+  color: #00ff66;
+  line-height: 1.1;
+}
+
+.engine-val.egt {
+  color: #00ff66;
+}
+
+.engine-unit {
+  font-size: 9px;
+  color: #6b7688;
+  margin-bottom: 6px;
+}
+
+.ewd-masters {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.master-light {
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #2a3543;
+  color: #44505f;
+  opacity: 0.5;
+}
+
+.master-light.warn.on {
+  background: #ff3b30;
+  color: #000;
+  border-color: #ff3b30;
+  opacity: 1;
+}
+
+.master-light.caut.on {
+  background: #ffcc00;
+  color: #000;
+  border-color: #ffcc00;
+  opacity: 1;
+}
+
+.ewd-ecam {
+  border-top: 1px solid #1e2733;
+  padding-top: 10px;
+  min-height: 70px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.ecam-memo {
+  color: #00ff66;
+}
+
+.ecam-status-hint {
+  color: #6b7688;
+  font-size: 11px;
+  margin-top: 6px;
+}
+
+/* ── SD ────────────────────────────────────────────────────── */
+.sd-hyd {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.hyd-col {
+  text-align: center;
+  min-width: 70px;
+}
+
+.hyd-name {
+  color: #00e0e0;
+  font-size: 11px;
+}
+
+.hyd-psi {
+  font-size: 22px;
+}
+
+.hyd-psi.ok {
+  color: #00ff66;
+}
+
+.hyd-psi.low {
+  color: #ffcc00;
+}
+
+.hyd-unit {
+  font-size: 9px;
+  color: #6b7688;
+}
+
+.hyd-res {
+  font-size: 11px;
+  color: #9fb0c3;
+  margin-top: 6px;
+}
+
+.hyd-pump {
+  font-size: 11px;
+  margin-top: 4px;
+}
+
+.hyd-pump.on {
+  color: #00ff66;
+}
+
+.hyd-pump.off {
+  color: #ffcc00;
+}
+
+.ptu {
+  text-align: center;
+  font-size: 11px;
+  color: #00e0e0;
+  padding-top: 18px;
+}
+
+.ptu-state {
+  color: #6b7688;
+  margin-top: 4px;
+}
+
+.ptu-state.run {
+  color: #00ff66;
+}
+
+.sd-placeholder {
+  color: #4a5666;
+  font-style: italic;
+  font-size: 13px;
+}
+
+@media (max-width: 900px) {
+  .app-body {
+    flex-direction: column;
+  }
+  .control-panel {
+    width: 100%;
+  }
+  .displays-grid {
+    grid-template-columns: 1fr;
+  }
+}
