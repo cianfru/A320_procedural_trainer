@@ -125,120 +125,18 @@
 
 /* ── FCU (glareshield) ─────────────────────────────────────── */
 .fcu {
-  display: flex;
-  align-items: stretch;
-  gap: 10px;
-  background: #1a1f25;
-  border: 1px solid #2a323b;
-  border-radius: 8px;
-  padding: 10px 12px;
+  width: 100%;
   font-variant-numeric: tabular-nums;
+  user-select: none;
 }
 
-.fcu-brand {
-  align-self: center;
-  font-size: 10px;
-  letter-spacing: 2px;
-  color: #5a6675;
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-}
-
-.fcu-window {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  padding: 0 8px;
-  border-right: 1px solid #2a323b;
-}
-
-.fcu-window-label {
-  font-size: 10px;
-  letter-spacing: 1px;
-  color: #8a97a6;
-}
-
-.fcu-readout {
-  background: #000;
-  border: 1px solid #2a323b;
-  border-radius: 3px;
-  min-width: 76px;
-  height: 34px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.fcu-value {
-  color: #00ff66;
-  font-size: 20px;
-  letter-spacing: 1px;
-}
-
-.fcu-managed-dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: #00ff66;
-  box-shadow: 0 0 6px #00ff66;
-}
-
-.fcu-knob {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.fcu-knob > button {
-  width: 24px;
-  height: 24px;
-  background: #232c36;
-  color: #cdd6e0;
-  border: 1px solid #36414d;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 11px;
-}
-
-.fcu-knob-pp {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.fcu-knob-pp button {
-  font-size: 8px;
-  padding: 2px 5px;
-  background: #232c36;
-  color: #9fb0c3;
-  border: 1px solid #36414d;
-  border-radius: 3px;
-  cursor: pointer;
-}
-
-.fcu-buttons {
-  display: grid;
-  grid-template-columns: repeat(3, auto);
-  gap: 5px;
-  align-content: center;
-  margin-left: auto;
-}
-
-.fcu-mode {
-  font-size: 11px;
-  padding: 6px 10px;
-  background: #232c36;
-  color: #7e8b99;
-  border: 1px solid #36414d;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.fcu-mode.on {
-  color: #00ff66;
-  border-color: #00ff66;
-  box-shadow: 0 0 5px rgba(0, 255, 102, 0.4);
+.fcu-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  /* Keep the long glareshield proportions from looking oversized. */
+  max-height: 220px;
+  object-fit: contain;
 }
 
 @media (max-width: 1000px) {
