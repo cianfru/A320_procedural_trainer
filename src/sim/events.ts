@@ -79,6 +79,12 @@ function applyCrewAction(state: AircraftState, action: CrewAction): void {
       else if (action.field === 'vs') fcu.vsActive = true;
       break;
     }
+    case 'FCU_MODE': {
+      const fcu = state.fcu;
+      if (action.field === 'spd') fcu.spdMode = fcu.spdMode === 'SPD' ? 'MACH' : 'SPD';
+      else fcu.hdgMode = fcu.hdgMode === 'HDG' ? 'TRK' : 'HDG';
+      break;
+    }
     case 'FCU_BUTTON':
       state.fcu[action.button] = !state.fcu[action.button];
       break;

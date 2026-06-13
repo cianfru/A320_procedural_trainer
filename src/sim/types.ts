@@ -161,6 +161,7 @@ export type CrewAction =
   | { kind: 'FCU_SET'; field: FcuField; delta: number }
   | { kind: 'FCU_PUSH'; field: FcuField } // → managed (or V/S off)
   | { kind: 'FCU_PULL'; field: FcuField } // → selected (or V/S on)
+  | { kind: 'FCU_MODE'; field: 'spd' | 'hdg' } // SPD↔MACH, HDG↔TRK
   | { kind: 'FCU_BUTTON'; button: FcuButton };
 
 // ─────────────────────────────────────────────────────────────────────────
