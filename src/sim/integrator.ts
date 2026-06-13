@@ -18,12 +18,11 @@ export function integrate(state: AircraftState, dt: number): void {
 }
 
 function integrateHydraulics(state: AircraftState, dt: number): void {
-  const leak = state.failures.find((f) => f.kind === 'G_HYD_LEAK');
-  if (leak && leak.kind === 'G_HYD_LEAK') {
-    const drainPerSec = leak.reservoirDrainFracPerMin / 60;
-    state.hyd.green.reservoirFrac = clamp01(
-      state.hyd.green.reservoirFrac - drainPerSec * dt,
-    );
+  for (const f of state.failures) {
+    if (f.kind !== 'HYD_LEAK') continue;
+    const drainPerSec = f.reservoirDrainFracPerMin / 60;
+    const sys = state.hyd[f.circuit];
+    sys.reservoirFrac = clamp01(sys.reservoirFrac - drainPerSec * dt);
   }
 }
 

@@ -219,6 +219,48 @@
   margin-top: 6px;
 }
 
+.ecam-block {
+  margin-bottom: 8px;
+}
+
+.ecam-actions {
+  margin: 2px 0 0 14px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.ecam-action {
+  color: #00e0e0; /* cyan action line */
+  white-space: pre;
+}
+
+.ecam-action.done {
+  color: #44505f;
+  text-decoration: line-through;
+}
+
+.ecam-action.next {
+  color: #00e0e0;
+  font-weight: 600;
+}
+
+.ecam-action.next::before {
+  content: '▸ ';
+  color: #ffcc00;
+}
+
+/* Failure menu grouping */
+.cp-group {
+  margin-bottom: 10px;
+}
+
+.cp-group-label {
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: #4a5666;
+  margin-bottom: 4px;
+}
+
 /* ── SD ────────────────────────────────────────────────────── */
 .sd-hyd {
   display: flex;

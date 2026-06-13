@@ -21,7 +21,7 @@ describe('tick pipeline (end-to-end, GREEN HYD scenario)', () => {
     expect(s.fwc.active).toHaveLength(0);
 
     // Inject the failure at t≈now (event applied on the next tick).
-    s = tick(s, FIXED_DT, [failureInject(s.clock.t, { kind: 'G_ENG1_PUMP_LOPR' })]);
+    s = tick(s, FIXED_DT, [failureInject(s.clock.t, { kind: 'HYD_PUMP_LOPR', circuit: 'green' })]);
     s = runFor(s, 1);
 
     // Event log recorded the injection (determinism substrate).
@@ -39,7 +39,11 @@ describe('tick pipeline (end-to-end, GREEN HYD scenario)', () => {
     let s = createInitialState();
     // Drain 0.25/min → ~4 min to empty. Pressure holds until reservoir < min.
     s = tick(s, FIXED_DT, [
-      failureInject(s.clock.t, { kind: 'G_HYD_LEAK', reservoirDrainFracPerMin: 6 }),
+      failureInject(s.clock.t, {
+        kind: 'HYD_LEAK',
+        circuit: 'green',
+        reservoirDrainFracPerMin: 6,
+      }),
     ]);
 
     s = runFor(s, 5); // 5 s at 6/min → 0.5 drained, still above min
@@ -53,7 +57,7 @@ describe('tick pipeline (end-to-end, GREEN HYD scenario)', () => {
 
   it('a crew action (restore pump) clears the caution', () => {
     let s = createInitialState();
-    s = tick(s, FIXED_DT, [failureInject(s.clock.t, { kind: 'G_ENG1_PUMP_LOPR' })]);
+    s = tick(s, FIXED_DT, [failureInject(s.clock.t, { kind: 'HYD_PUMP_LOPR', circuit: 'green' })]);
     s = runFor(s, 1);
     expect(s.fwc.active.map((i) => i.id)).toContain('HYD_G_SYS_LO_PR');
 

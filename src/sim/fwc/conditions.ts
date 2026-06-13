@@ -30,12 +30,30 @@ export const CONDITIONS: FwcCondition[] = [
   },
   {
     item: {
+      id: 'HYD_B_SYS_LO_PR',
+      color: 'CAUTION',
+      title: 'HYD B SYS LO PR',
+      sdPage: 'HYD',
+    },
+    present: (s) => s.hyd.blue.pressurePsi < HYD.LO_PR_PSI,
+  },
+  {
+    item: {
       id: 'HYD_Y_SYS_LO_PR',
       color: 'CAUTION',
       title: 'HYD Y SYS LO PR',
       sdPage: 'HYD',
     },
     present: (s) => s.hyd.yellow.pressurePsi < HYD.LO_PR_PSI,
+  },
+  {
+    item: {
+      id: 'HYD_PTU_FAULT',
+      color: 'CAUTION',
+      title: 'HYD PTU FAULT',
+      sdPage: 'HYD',
+    },
+    present: (s) => s.failures.some((f) => f.kind === 'HYD_PTU_FAULT'),
   },
   {
     item: {

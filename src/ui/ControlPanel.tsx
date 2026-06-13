@@ -1,4 +1,6 @@
 import { useSimStore } from '../store/useSimStore';
+import { RUNNABLE_FAILURES } from '../sim/catalog/registry';
+import type { SystemId } from '../sim/catalog/types';
 
 /**
  * Instructor / failure-injection panel + sim transport. Every button maps to a
@@ -31,26 +33,20 @@ export function ControlPanel() {
 
       <div className="cp-section">
         <h3>FAILURES</h3>
-        <button onClick={() => injectFailure({ kind: 'G_ENG1_PUMP_LOPR' })}>
-          GREEN ENG1 PUMP LO PR
-        </button>
-        <button
-          onClick={() =>
-            injectFailure({ kind: 'G_HYD_LEAK', reservoirDrainFracPerMin: 0.25 })
-          }
-        >
-          GREEN HYD LEAK
-        </button>
-        <button
-          onClick={() =>
-            injectFailure({ kind: 'RAPID_DEPRESS', cabinClimbFpm: 6000 })
-          }
-        >
-          RAPID DEPRESS
-        </button>
-        <button onClick={() => injectFailure({ kind: 'ENG_FIRE', engine: 1 })}>
-          ENG 1 FIRE
-        </button>
+        {groupBySystem(RUNNABLE_FAILURES).map(([system, entries]) => (
+          <div key={system} className="cp-group">
+            <div className="cp-group-label">{system}</div>
+            {entries.map((e) => (
+              <button
+                key={e.id}
+                title={`ATA ${e.ata} · ${e.status}`}
+                onClick={() => injectFailure(e.build!())}
+              >
+                {e.title.replace(/^[A-Z/]+:\s*/, '')}
+              </button>
+            ))}
+          </div>
+        ))}
       </div>
 
       <div className="cp-section">
@@ -61,6 +57,9 @@ export function ControlPanel() {
           }
         >
           GREEN PUMP {greenPump ? 'OFF' : 'ON'}
+        </button>
+        <button onClick={() => sendCrewAction({ kind: 'ECAM_ACK_LINE' })}>
+          ECAM ACTIONS — OVERFLY LINE
         </button>
         <div className="cp-row">
           <button onClick={() => sendCrewAction({ kind: 'ECAM_CLR' })}>
@@ -81,4 +80,17 @@ export function ControlPanel() {
       </div>
     </div>
   );
+}
+
+/** Group runnable failures by system for a tidy, ATA-ordered menu. */
+function groupBySystem<T extends { system: SystemId }>(
+  entries: T[],
+): Array<[SystemId, T[]]> {
+  const map = new Map<SystemId, T[]>();
+  for (const e of entries) {
+    const list = map.get(e.system) ?? [];
+    list.push(e);
+    map.set(e.system, list);
+  }
+  return [...map.entries()];
 }

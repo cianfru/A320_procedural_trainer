@@ -1,4 +1,5 @@
 import type { AircraftState, CrewAction, ActiveFailure, SimEvent } from './types';
+import { PROCEDURES } from './fwc/procedures';
 
 /**
  * Event apply — tick step 1 (spec §2.1).
@@ -46,29 +47,69 @@ function applyCrewAction(state: AircraftState, action: CrewAction): void {
       state.fwc.cleared = [];
       break;
     }
+    case 'ECAM_ACK_LINE':
+      ackTopManualLine(state);
+      break;
   }
 }
 
+/**
+ * Overfly the next MANUAL action line of the top active ECAM procedure. SENSED
+ * lines are never acked here — they clear from state in the actions reducer.
+ */
+function ackTopManualLine(state: AircraftState): void {
+  const top = state.fwc.active[0];
+  if (!top) return;
+  const proc = PROCEDURES[top.id];
+  if (!proc) return;
+
+  const progress = state.fwc.procedures[top.id] ?? {
+    completedLineIds: [],
+    complete: false,
+  };
+  const done = new Set(progress.completedLineIds);
+  const next = proc.lines.find((l) => l.type === 'MANUAL' && !done.has(l.id));
+  if (!next) return;
+
+  done.add(next.id);
+  state.fwc.procedures[top.id] = {
+    completedLineIds: [...done],
+    complete: proc.lines.every((l) => done.has(l.id)),
+  };
+}
+
 function applyFailure(state: AircraftState, failure: ActiveFailure): void {
-  // Avoid stacking duplicate failures of the same kind.
-  if (!state.failures.some((f) => f.kind === failure.kind)) {
+  // Avoid stacking exact-duplicate failures (same kind + same target).
+  if (!state.failures.some((f) => sameFailure(f, failure))) {
     state.failures.push(failure);
   }
 
   switch (failure.kind) {
-    case 'G_ENG1_PUMP_LOPR':
-      // Engine-1-driven GREEN pump loses pressure: model as pump off.
-      state.hyd.green.pumpOn = false;
+    case 'HYD_PUMP_LOPR':
+      // Pump loses pressure: model as the pump being off.
+      state.hyd[failure.circuit].pumpOn = false;
+      break;
+    case 'HYD_PTU_FAULT':
+      // PTU faulted: disarm so derivation will never command it to run.
+      state.hyd.ptu.armed = false;
       break;
     case 'ENG_FIRE':
       state.engines[failure.engine - 1].running = false;
       break;
-    // G_HYD_LEAK and RAPID_DEPRESS carry rates consumed by the integrator;
+    // HYD_LEAK and RAPID_DEPRESS carry rates consumed by the integrator;
     // nothing discrete to set at injection time.
-    case 'G_HYD_LEAK':
+    case 'HYD_LEAK':
     case 'RAPID_DEPRESS':
       break;
   }
+}
+
+/** Identity for de-duping injected failures (kind + the field that targets it). */
+function sameFailure(a: ActiveFailure, b: ActiveFailure): boolean {
+  if (a.kind !== b.kind) return false;
+  if ('circuit' in a && 'circuit' in b) return a.circuit === b.circuit;
+  if (a.kind === 'ENG_FIRE' && b.kind === 'ENG_FIRE') return a.engine === b.engine;
+  return true;
 }
 
 /** Convenience constructors so callers don't hand-build event objects. */

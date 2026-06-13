@@ -3,6 +3,7 @@ import { applyEvent } from './events';
 import { integrate } from './integrator';
 import { deriveSystems } from './systems';
 import { reduceFwc } from './fwc/fwc';
+import { reduceEcamActions } from './fwc/ecamActions';
 
 /**
  * One fixed sim step, in the load-bearing order from spec §2.1:
@@ -37,8 +38,9 @@ export function tick(
   // 3. Systems derivation (pure).
   deriveSystems(state);
 
-  // 4. FWC reduce (stateful).
+  // 4. FWC reduce (stateful) — annunciation, then ECAM ACTIONS sequencing.
   state.fwc = reduceFwc(state.fwc, state, dt);
+  state.fwc = reduceEcamActions(state.fwc, state);
 
   // Advance the clock.
   state.clock.t += dt;
