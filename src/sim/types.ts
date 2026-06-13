@@ -103,10 +103,16 @@ export interface ConfigState {
 // Failures — discrete bad-condition mutators that carry RATES, not effects
 // ─────────────────────────────────────────────────────────────────────────
 
+export type HydCircuit = 'green' | 'blue' | 'yellow';
+
 export type ActiveFailure =
-  | { kind: 'G_HYD_LEAK'; reservoirDrainFracPerMin: number }
-  | { kind: 'G_ENG1_PUMP_LOPR' }
+  // ATA 29 — Hydraulics
+  | { kind: 'HYD_LEAK'; circuit: HydCircuit; reservoirDrainFracPerMin: number }
+  | { kind: 'HYD_PUMP_LOPR'; circuit: HydCircuit }
+  | { kind: 'HYD_PTU_FAULT' }
+  // ATA 21 — Pressurisation
   | { kind: 'RAPID_DEPRESS'; cabinClimbFpm: number }
+  // ATA 70 — Powerplant
   | { kind: 'ENG_FIRE'; engine: 1 | 2 };
 
 export type FailureKind = ActiveFailure['kind'];
@@ -116,10 +122,12 @@ export type FailureKind = ActiveFailure['kind'];
 // ─────────────────────────────────────────────────────────────────────────
 
 export type CrewAction =
-  | { kind: 'HYD_PUMP'; sys: 'green' | 'blue' | 'yellow'; on: boolean }
+  | { kind: 'HYD_PUMP'; sys: HydCircuit; on: boolean }
   | { kind: 'PTU_ARM'; armed: boolean }
   | { kind: 'ECAM_CLR' }
   | { kind: 'ECAM_RECALL' }
+  /** Acknowledge/overfly the next MANUAL action line of the top ECAM procedure. */
+  | { kind: 'ECAM_ACK_LINE' }
   | { kind: 'MASTER_WARN_ACK' }
   | { kind: 'MASTER_CAUT_ACK' };
 
@@ -165,6 +173,37 @@ export interface FlightPhaseInhibit {
   phases: FlightPhase[];
 }
 
+// ── ECAM ACTIONS — the procedure (checklist) layer ───────────────────────
+// Each annunciated item may carry a procedure: an ordered list of action
+// lines the crew works through. A SENSED line clears automatically when the
+// aircraft state satisfies its condition (the crew did the action → state
+// changed → line clears). A MANUAL line is overflown by the crew (ECAM_ACK_LINE).
+// This keeps invariant #2 intact: completion is DERIVED from state, not authored.
+
+export type EcamActionType = 'SENSED' | 'MANUAL';
+
+export interface EcamActionLine {
+  id: string;
+  text: string;
+  type: EcamActionType;
+  /**
+   * SENSED lines only: completion predicate over aircraft state. The line
+   * clears when this returns true (i.e. the demanded system state is reached).
+   */
+  done?: (s: AircraftState) => boolean;
+}
+
+export interface EcamProcedure {
+  itemId: string;
+  lines: EcamActionLine[];
+}
+
+/** Live progress for one in-work procedure (owned by the FWC slice). */
+export interface ProcedureProgress {
+  completedLineIds: string[];
+  complete: boolean;
+}
+
 export interface FwcState {
   active: EcamItem[];
   cleared: EcamItem[];
@@ -176,6 +215,8 @@ export interface FwcState {
   masterCaut: boolean;
   sdPage: SdPageId;
   inhibits: FlightPhaseInhibit[];
+  /** ECAM ACTIONS progress, keyed by EcamItem.id. */
+  procedures: Record<string, ProcedureProgress>;
 }
 
 // ─────────────────────────────────────────────────────────────────────────

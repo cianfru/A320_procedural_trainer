@@ -65,6 +65,7 @@ export function createInitialState(): AircraftState {
       masterCaut: false,
       sdPage: 'CRUISE',
       inhibits: [],
+      procedures: {},
     },
     eventLog: [],
   };

@@ -1,5 +1,7 @@
 import { useSimStore } from '../store/useSimStore';
 import type { EcamColor } from '../sim/types';
+import { PROCEDURES } from '../sim/fwc/procedures';
+import { activeLineId } from '../sim/fwc/ecamActions';
 
 /**
  * Upper E/WD — engine row (top) + warning/caution + memo (bottom).
@@ -52,18 +54,45 @@ export function EWD() {
           <div className="ecam-memo">NORMAL</div>
         )}
         {fwc.active.map((item) => (
-          <div
-            key={item.id}
-            className="ecam-line"
-            style={{ color: COLOR[item.color] }}
-          >
-            {item.title}
+          <div key={item.id} className="ecam-block">
+            <div className="ecam-line" style={{ color: COLOR[item.color] }}>
+              {item.title}
+            </div>
+            <EcamActions itemId={item.id} />
           </div>
         ))}
         {fwc.cleared.length > 0 && (
           <div className="ecam-status-hint">…{fwc.cleared.length} in STATUS</div>
         )}
       </div>
+    </div>
+  );
+}
+
+/** ECAM ACTIONS lines for one annunciated item: completed lines are dimmed,
+ *  the next outstanding line is highlighted (the cyan "do this now" cue). */
+function EcamActions({ itemId }: { itemId: string }) {
+  const fwc = useSimStore((s) => s.state.fwc);
+  const proc = PROCEDURES[itemId];
+  if (!proc) return null;
+
+  const done = new Set(fwc.procedures[itemId]?.completedLineIds ?? []);
+  const next = activeLineId(fwc, itemId);
+
+  return (
+    <div className="ecam-actions">
+      {proc.lines.map((line) => {
+        const isDone = done.has(line.id);
+        const isNext = line.id === next;
+        return (
+          <div
+            key={line.id}
+            className={`ecam-action ${isDone ? 'done' : ''} ${isNext ? 'next' : ''}`}
+          >
+            {line.text}
+          </div>
+        );
+      })}
     </div>
   );
 }
