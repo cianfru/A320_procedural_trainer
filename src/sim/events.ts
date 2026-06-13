@@ -50,6 +50,38 @@ function applyCrewAction(state: AircraftState, action: CrewAction): void {
     case 'ECAM_ACK_LINE':
       ackTopManualLine(state);
       break;
+    case 'FCU_SET': {
+      const fcu = state.fcu;
+      fcu[action.field] += action.delta;
+      // Rotating a knob selects that channel (de-manages it).
+      if (action.field === 'spd') fcu.spdManaged = false;
+      else if (action.field === 'hdg') fcu.hdgManaged = false;
+      else if (action.field === 'vs') fcu.vsActive = true;
+      if (action.field === 'hdg') fcu.hdg = ((fcu.hdg % 360) + 360) % 360;
+      break;
+    }
+    case 'FCU_PUSH': {
+      const fcu = state.fcu;
+      if (action.field === 'spd') fcu.spdManaged = true;
+      else if (action.field === 'hdg') fcu.hdgManaged = true;
+      else if (action.field === 'alt') fcu.altManaged = true;
+      else if (action.field === 'vs') {
+        fcu.vsActive = false; // push V/S = level off (V/S 0 / managed)
+        fcu.vs = 0;
+      }
+      break;
+    }
+    case 'FCU_PULL': {
+      const fcu = state.fcu;
+      if (action.field === 'spd') fcu.spdManaged = false;
+      else if (action.field === 'hdg') fcu.hdgManaged = false;
+      else if (action.field === 'alt') fcu.altManaged = false;
+      else if (action.field === 'vs') fcu.vsActive = true;
+      break;
+    }
+    case 'FCU_BUTTON':
+      state.fcu[action.button] = !state.fcu[action.button];
+      break;
   }
 }
 

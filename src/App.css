@@ -55,6 +55,7 @@
   border: 1px solid #2a3543;
   border-radius: 5px;
   cursor: pointer;
+  text-align: left;
 }
 
 .cp-section button:hover {
@@ -68,6 +69,7 @@
 
 .cp-row button {
   flex: 1;
+  text-align: center;
 }
 
 .cp-clock {
@@ -77,179 +79,6 @@
   margin-bottom: 8px;
 }
 
-/* ── Display grid ──────────────────────────────────────────── */
-.displays-grid {
-  flex: 1;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-.display {
-  background: #000;
-  border: 1px solid #1e2733;
-  border-radius: 8px;
-  padding: 12px;
-  min-height: 240px;
-  font-variant-numeric: tabular-nums;
-}
-
-.display-title {
-  font-size: 11px;
-  letter-spacing: 1px;
-  color: #6b7688;
-  margin-bottom: 10px;
-}
-
-.display-stub {
-  margin-top: 16px;
-  font-size: 12px;
-  color: #4a5666;
-  font-style: italic;
-}
-
-/* ── PFD ───────────────────────────────────────────────────── */
-.pfd-readout {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.pfd-field {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-}
-
-.pfd-label {
-  width: 48px;
-  color: #00e0e0;
-  font-size: 12px;
-}
-
-.pfd-value {
-  font-size: 22px;
-  color: #00ff66;
-}
-
-.pfd-unit {
-  font-size: 11px;
-  color: #6b7688;
-}
-
-/* ── E/WD ──────────────────────────────────────────────────── */
-.ewd-engines {
-  display: flex;
-  gap: 24px;
-  justify-content: center;
-  margin-bottom: 12px;
-}
-
-.engine-col {
-  text-align: center;
-}
-
-.engine-label {
-  color: #00e0e0;
-  font-size: 12px;
-  margin-bottom: 4px;
-}
-
-.engine-val {
-  font-size: 20px;
-  color: #00ff66;
-  line-height: 1.1;
-}
-
-.engine-val.egt {
-  color: #00ff66;
-}
-
-.engine-unit {
-  font-size: 9px;
-  color: #6b7688;
-  margin-bottom: 6px;
-}
-
-.ewd-masters {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-  margin-bottom: 12px;
-}
-
-.master-light {
-  font-size: 11px;
-  padding: 4px 8px;
-  border-radius: 4px;
-  border: 1px solid #2a3543;
-  color: #44505f;
-  opacity: 0.5;
-}
-
-.master-light.warn.on {
-  background: #ff3b30;
-  color: #000;
-  border-color: #ff3b30;
-  opacity: 1;
-}
-
-.master-light.caut.on {
-  background: #ffcc00;
-  color: #000;
-  border-color: #ffcc00;
-  opacity: 1;
-}
-
-.ewd-ecam {
-  border-top: 1px solid #1e2733;
-  padding-top: 10px;
-  min-height: 70px;
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-.ecam-memo {
-  color: #00ff66;
-}
-
-.ecam-status-hint {
-  color: #6b7688;
-  font-size: 11px;
-  margin-top: 6px;
-}
-
-.ecam-block {
-  margin-bottom: 8px;
-}
-
-.ecam-actions {
-  margin: 2px 0 0 14px;
-  font-size: 13px;
-  line-height: 1.45;
-}
-
-.ecam-action {
-  color: #00e0e0; /* cyan action line */
-  white-space: pre;
-}
-
-.ecam-action.done {
-  color: #44505f;
-  text-decoration: line-through;
-}
-
-.ecam-action.next {
-  color: #00e0e0;
-  font-weight: 600;
-}
-
-.ecam-action.next::before {
-  content: '▸ ';
-  color: #ffcc00;
-}
-
-/* Failure menu grouping */
 .cp-group {
   margin-bottom: 10px;
 }
@@ -261,83 +90,158 @@
   margin-bottom: 4px;
 }
 
-/* ── SD ────────────────────────────────────────────────────── */
-.sd-hyd {
+/* ── Flight deck ───────────────────────────────────────────── */
+.flight-deck {
+  flex: 1;
   display: flex;
-  gap: 16px;
-  align-items: flex-start;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.displays-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* Display Unit bezel + glass */
+.du {
+  background: #14181d;
+  border: 4px solid #20262d;
+  border-radius: 8px;
+  box-shadow: inset 0 0 0 2px #000;
+  padding: 4px;
+  aspect-ratio: 1 / 1;
+}
+
+.du-glass {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  border-radius: 3px;
+}
+
+/* ── FCU (glareshield) ─────────────────────────────────────── */
+.fcu {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  background: #1a1f25;
+  border: 1px solid #2a323b;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.fcu-brand {
+  align-self: center;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: #5a6675;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
+.fcu-window {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 0 8px;
+  border-right: 1px solid #2a323b;
+}
+
+.fcu-window-label {
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: #8a97a6;
+}
+
+.fcu-readout {
+  background: #000;
+  border: 1px solid #2a323b;
+  border-radius: 3px;
+  min-width: 76px;
+  height: 34px;
+  display: flex;
+  align-items: center;
   justify-content: center;
 }
 
-.hyd-col {
-  text-align: center;
-  min-width: 70px;
-}
-
-.hyd-name {
-  color: #00e0e0;
-  font-size: 11px;
-}
-
-.hyd-psi {
-  font-size: 22px;
-}
-
-.hyd-psi.ok {
+.fcu-value {
   color: #00ff66;
+  font-size: 20px;
+  letter-spacing: 1px;
 }
 
-.hyd-psi.low {
-  color: #ffcc00;
+.fcu-managed-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #00ff66;
+  box-shadow: 0 0 6px #00ff66;
 }
 
-.hyd-unit {
-  font-size: 9px;
-  color: #6b7688;
+.fcu-knob {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
-.hyd-res {
+.fcu-knob > button {
+  width: 24px;
+  height: 24px;
+  background: #232c36;
+  color: #cdd6e0;
+  border: 1px solid #36414d;
+  border-radius: 4px;
+  cursor: pointer;
   font-size: 11px;
+}
+
+.fcu-knob-pp {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.fcu-knob-pp button {
+  font-size: 8px;
+  padding: 2px 5px;
+  background: #232c36;
   color: #9fb0c3;
-  margin-top: 6px;
+  border: 1px solid #36414d;
+  border-radius: 3px;
+  cursor: pointer;
 }
 
-.hyd-pump {
+.fcu-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: 5px;
+  align-content: center;
+  margin-left: auto;
+}
+
+.fcu-mode {
   font-size: 11px;
-  margin-top: 4px;
+  padding: 6px 10px;
+  background: #232c36;
+  color: #7e8b99;
+  border: 1px solid #36414d;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
-.hyd-pump.on {
+.fcu-mode.on {
   color: #00ff66;
+  border-color: #00ff66;
+  box-shadow: 0 0 5px rgba(0, 255, 102, 0.4);
 }
 
-.hyd-pump.off {
-  color: #ffcc00;
-}
-
-.ptu {
-  text-align: center;
-  font-size: 11px;
-  color: #00e0e0;
-  padding-top: 18px;
-}
-
-.ptu-state {
-  color: #6b7688;
-  margin-top: 4px;
-}
-
-.ptu-state.run {
-  color: #00ff66;
-}
-
-.sd-placeholder {
-  color: #4a5666;
-  font-style: italic;
-  font-size: 13px;
-}
-
-@media (max-width: 900px) {
+@media (max-width: 1000px) {
   .app-body {
     flex-direction: column;
   }
@@ -346,5 +250,8 @@
   }
   .displays-grid {
     grid-template-columns: 1fr;
+  }
+  .fcu {
+    flex-wrap: wrap;
   }
 }

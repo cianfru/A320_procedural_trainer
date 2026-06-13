@@ -4,6 +4,7 @@ import { PFD } from './displays/PFD';
 import { ND } from './displays/ND';
 import { EWD } from './displays/EWD';
 import { SD } from './displays/SD';
+import { FCU } from './displays/FCU';
 import { ControlPanel } from './ui/ControlPanel';
 import './App.css';
 
@@ -30,11 +31,14 @@ export default function App() {
 
       <div className="app-body">
         <ControlPanel />
-        <main className="displays-grid">
-          <PFD />
-          <ND />
-          <EWD />
-          <SD />
+        <main className="flight-deck">
+          <FCU />
+          <div className="displays-grid">
+            <PFD />
+            <ND />
+            <EWD />
+            <SD />
+          </div>
         </main>
       </div>
     </div>

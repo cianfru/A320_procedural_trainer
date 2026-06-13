@@ -99,6 +99,33 @@ export interface ConfigState {
   signs: { seatbelts: boolean; noSmoking: boolean };
 }
 
+// ── FCU — Flight Control Unit (glareshield) ──────────────────────────────
+// Selected targets + mode buttons. Displayed and settable now; the autoflight
+// logic that makes them actually fly the aircraft is Stage 7 (drawn-then-
+// stubbed posture, spec §4). A "managed" channel shows a dot instead of a value.
+
+export interface FcuState {
+  spd: number; // selected SPD (kt) — or MACH×100 when spdMode==='MACH'
+  spdMode: 'SPD' | 'MACH';
+  spdManaged: boolean;
+  hdg: number; // selected HDG/TRK (deg)
+  hdgMode: 'HDG' | 'TRK';
+  hdgManaged: boolean;
+  alt: number; // selected ALT (ft)
+  altManaged: boolean;
+  vs: number; // selected V/S (fpm); 0 + !vsActive ⇒ dashes
+  vsActive: boolean;
+  ap1: boolean;
+  ap2: boolean;
+  athr: boolean;
+  loc: boolean;
+  appr: boolean;
+  exped: boolean;
+}
+
+export type FcuField = 'spd' | 'hdg' | 'alt' | 'vs';
+export type FcuButton = 'ap1' | 'ap2' | 'athr' | 'loc' | 'appr' | 'exped';
+
 // ─────────────────────────────────────────────────────────────────────────
 // Failures — discrete bad-condition mutators that carry RATES, not effects
 // ─────────────────────────────────────────────────────────────────────────
@@ -129,7 +156,12 @@ export type CrewAction =
   /** Acknowledge/overfly the next MANUAL action line of the top ECAM procedure. */
   | { kind: 'ECAM_ACK_LINE' }
   | { kind: 'MASTER_WARN_ACK' }
-  | { kind: 'MASTER_CAUT_ACK' };
+  | { kind: 'MASTER_CAUT_ACK' }
+  // FCU (glareshield)
+  | { kind: 'FCU_SET'; field: FcuField; delta: number }
+  | { kind: 'FCU_PUSH'; field: FcuField } // → managed (or V/S off)
+  | { kind: 'FCU_PULL'; field: FcuField } // → selected (or V/S on)
+  | { kind: 'FCU_BUTTON'; button: FcuButton };
 
 // ─────────────────────────────────────────────────────────────────────────
 // Event log — ordered, timestamped, replayable (spec §2.3)
@@ -230,6 +262,7 @@ export interface AircraftState {
   engines: EngineState[];
   hyd: HydraulicsState;
   config: ConfigState;
+  fcu: FcuState;
   o2: { crewMin: number; paxMin: number };
 
   failures: ActiveFailure[];
