@@ -62,6 +62,30 @@ function applyCrewAction(state: AircraftState, action: CrewAction): void {
       state.elec.apuGen.on = action.on;
       state.elec.apuGen.available = action.on;
       break;
+    case 'SET_VS':
+      state.kinematics.vsFpm = action.fpm;
+      break;
+    case 'THR_IDLE':
+      for (const e of state.engines) {
+        e.n1Cmd = 19; // idle N1 (LEAP-1A ~19%)
+        e.tla = 0;
+      }
+      break;
+    case 'SPEEDBRAKE':
+      state.config.speedbrake = Math.max(0, Math.min(1, action.value));
+      break;
+    case 'ENG_MODE_IGN':
+      state.config.engModeIgn = action.on;
+      break;
+    case 'CREW_OXY':
+      state.config.masks = action.on;
+      break;
+    case 'SIGNS_ON':
+      state.config.signs = { seatbelts: true, noSmoking: true };
+      break;
+    case 'AIR_PACK':
+      state.press[action.pack === 1 ? 'pack1On' : 'pack2On'] = action.on;
+      break;
     case 'FCU_SET': {
       const fcu = state.fcu;
       fcu[action.field] += action.delta;
@@ -150,8 +174,12 @@ function applyFailure(state: AircraftState, failure: ActiveFailure): void {
       // Generator trips offline. Derivation drops the bus; FWC raises the fault.
       (failure.gen === 1 ? state.elec.gen1 : state.elec.gen2).fault = true;
       break;
-    // AC_BUS / TR faults are read from failures[] by derivation; nothing to set.
-    // HYD_LEAK and RAPID_DEPRESS carry rates consumed by the integrator.
+    case 'AIR_PACK_FAULT':
+      // Pack trips off; air derivation drops it, FWC raises the caution.
+      state.press[failure.pack === 1 ? 'pack1On' : 'pack2On'] = false;
+      break;
+    // Read from failures[] by derivation / consumed by integrator; nothing to set.
+    case 'CAB_PR_SYS_FAULT':
     case 'ELEC_AC_BUS_FAULT':
     case 'ELEC_TR_FAULT':
     case 'HYD_LEAK':
@@ -168,6 +196,8 @@ function sameFailure(a: ActiveFailure, b: ActiveFailure): boolean {
   if (a.kind === 'ELEC_GEN_FAULT' && b.kind === 'ELEC_GEN_FAULT') return a.gen === b.gen;
   if (a.kind === 'ELEC_AC_BUS_FAULT' && b.kind === 'ELEC_AC_BUS_FAULT') return a.bus === b.bus;
   if (a.kind === 'ELEC_TR_FAULT' && b.kind === 'ELEC_TR_FAULT') return a.tr === b.tr;
+  if (a.kind === 'AIR_PACK_FAULT' && b.kind === 'AIR_PACK_FAULT') return a.pack === b.pack;
+  if (a.kind === 'CAB_PR_SYS_FAULT' && b.kind === 'CAB_PR_SYS_FAULT') return a.sys === b.sys;
   return true;
 }
 

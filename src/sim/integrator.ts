@@ -38,15 +38,52 @@ function integrateEngines(state: AircraftState, dt: number): void {
 }
 
 function integratePressurisation(state: AircraftState, dt: number): void {
+  const p = state.press;
+  const acAlt = state.kinematics.altFt;
   const depress = state.failures.find((f) => f.kind === 'RAPID_DEPRESS');
+  const packsLost = !p.pack1 && !p.pack2;
+
+  const prevCabin = p.cabinAltFt;
+  let target: number;
+  let rateFpm: number;
+
   if (depress && depress.kind === 'RAPID_DEPRESS') {
-    state.press.cabinVsFpm = depress.cabinClimbFpm;
+    // Depressurised: cabin chases ambient (aircraft) altitude — up while high,
+    // and back DOWN as the crew descends. This is the dynamic that makes the
+    // emergency-descent scenario work end to end.
+    target = acAlt;
+    rateFpm = depress.cabinClimbFpm;
+  } else if (packsLost) {
+    // No pressurisation source: cabin drifts toward ambient, slowly.
+    target = acAlt;
+    rateFpm = 500;
+  } else {
+    // Normal control: hold a scheduled cabin altitude (≤ 8050 ft, FBW max).
+    target = Math.max(0, Math.min(8050, acAlt * (8000 / 39000)));
+    rateFpm = 500;
   }
-  state.press.cabinAltFt += (state.press.cabinVsFpm / 60) * dt;
+
+  const maxStep = (rateFpm / 60) * dt;
+  const delta = target - p.cabinAltFt;
+  p.cabinAltFt += Math.sign(delta) * Math.min(Math.abs(delta), maxStep);
+  p.cabinVsFpm = ((p.cabinAltFt - prevCabin) / dt) * 60;
+
+  // Differential pressure from the cabin/ambient altitudes (ISA approximation).
+  p.diffPsi = isaPressurePsi(p.cabinAltFt) - isaPressurePsi(acAlt);
+}
+
+/** Crude ISA static pressure (psi) vs altitude (ft) — good enough for ΔP display. */
+function isaPressurePsi(altFt: number): number {
+  return 14.696 * Math.pow(1 - 6.8756e-6 * altFt, 5.2559);
 }
 
 function integrateKinematics(state: AircraftState, dt: number): void {
   state.kinematics.altFt += (state.kinematics.vsFpm / 60) * dt;
+  // Emergency-descent level-off: arrest the descent at FL100 (10,000 ft).
+  if (state.kinematics.vsFpm < 0 && state.kinematics.altFt <= 10000) {
+    state.kinematics.altFt = 10000;
+    state.kinematics.vsFpm = 0;
+  }
 }
 
 function integrateOxygen(state: AircraftState, dt: number): void {

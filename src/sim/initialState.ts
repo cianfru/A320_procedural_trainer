@@ -34,6 +34,11 @@ export function createInitialState(): AircraftState {
       diffPsi: 7.8,
       outflow: 0.5,
       packFlow: 'NORM',
+      pack1On: true,
+      pack2On: true,
+      pack1: true,
+      pack2: true,
+      paxMasksDeployed: false,
     },
     engines: [
       { n1: 85, n2: 92, egt: 600, ff: 1100, tla: 25, n1Cmd: 85, running: true },
@@ -72,6 +77,7 @@ export function createInitialState(): AircraftState {
       slats: 0,
       speedbrake: 0,
       masks: false,
+      engModeIgn: false,
       signs: { seatbelts: true, noSmoking: true },
     },
     fcu: {

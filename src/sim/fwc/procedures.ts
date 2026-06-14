@@ -103,6 +103,53 @@ const elecEmerConfig: EcamProcedure = {
   ],
 };
 
+// ── AIR / PRESS (ATA 21) ─────────────────────────────────────────────────
+/**
+ * CAB PR EXCESS CAB ALT — drives the EMER DESCENT (verbatim from FBW
+ * EwdMessages.ts, condensed). SENSED lines clear as the crew reaches each
+ * demanded state, so the panel buttons fly the procedure.
+ */
+const cabPrExcessCabAlt: EcamProcedure = {
+  itemId: 'EXCESS_CAB_ALT',
+  lines: [
+    { id: 'crew_oxy', text: `CREW OXY MASKS.....USE`, type: 'SENSED', done: (s) => s.config.masks },
+    {
+      id: 'signs',
+      text: `SIGNS...............ON`,
+      type: 'SENSED',
+      done: (s) => s.config.signs.seatbelts && s.config.signs.noSmoking,
+    },
+    { id: 'descent', text: `EMER DESCENT...INITIATE`, type: 'SENSED', done: (s) => s.kinematics.vsFpm < -500 },
+    { id: 'thr_idle', text: `THR LEVERS........IDLE`, type: 'SENSED', done: (s) => (s.engines[0]?.n1Cmd ?? 100) <= 25 },
+    { id: 'spd_brk', text: `SPD BRK...........FULL`, type: 'SENSED', done: (s) => s.config.speedbrake >= 0.95 },
+    { id: 'eng_ign', text: `ENG MODE SEL.......IGN`, type: 'SENSED', done: (s) => s.config.engModeIgn },
+    { id: 'atc', text: `ATC.............NOTIFY`, type: 'MANUAL' },
+    { id: 'xpdr', text: `XPDR 7700.....CONSIDER`, type: 'MANUAL' },
+  ],
+};
+
+function airPackFault(pack: 1 | 2): EcamProcedure {
+  return {
+    itemId: `AIR_PACK_${pack}_FAULT`,
+    lines: [
+      {
+        id: `pack${pack}_off`,
+        text: `PACK ${pack}.............OFF`,
+        type: 'SENSED',
+        done: (s) => !s.press[pack === 1 ? 'pack1On' : 'pack2On'],
+      },
+    ],
+  };
+}
+
+const cabPrSys12Fault: EcamProcedure = {
+  itemId: 'CAB_PR_SYS_1_2_FAULT',
+  lines: [
+    { id: 'mode_man', text: `MODE SEL...........MAN`, type: 'MANUAL' },
+    { id: 'man_vs', text: `MAN V/S CTL....AS RQRD`, type: 'MANUAL' },
+  ],
+};
+
 const ALL: EcamProcedure[] = [
   hydSysLoPr('green'),
   hydSysLoPr('blue'),
@@ -115,6 +162,10 @@ const ALL: EcamProcedure[] = [
   elecTrFault(1),
   elecTrFault(2),
   elecEmerConfig,
+  cabPrExcessCabAlt,
+  airPackFault(1),
+  airPackFault(2),
+  cabPrSys12Fault,
 ];
 
 export const PROCEDURES: Record<string, EcamProcedure> = Object.fromEntries(
