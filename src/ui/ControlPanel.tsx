@@ -14,6 +14,8 @@ export function ControlPanel() {
   const running = useSimStore((s) => s.running);
   const t = useSimStore((s) => s.state.clock.t);
   const greenPump = useSimStore((s) => s.state.hyd.green.pumpOn);
+  const gen1On = useSimStore((s) => s.state.elec.gen1.on);
+  const gen2On = useSimStore((s) => s.state.elec.gen2.on);
   const { start, stop, reset, injectFailure, sendCrewAction } = useSimStore();
 
   return (
@@ -57,6 +59,17 @@ export function ControlPanel() {
           }
         >
           GREEN PUMP {greenPump ? 'OFF' : 'ON'}
+        </button>
+        <div className="cp-row">
+          <button onClick={() => sendCrewAction({ kind: 'ELEC_GEN', gen: 1, on: !gen1On })}>
+            GEN 1 {gen1On ? 'OFF' : 'ON'}
+          </button>
+          <button onClick={() => sendCrewAction({ kind: 'ELEC_GEN', gen: 2, on: !gen2On })}>
+            GEN 2 {gen2On ? 'OFF' : 'ON'}
+          </button>
+        </div>
+        <button onClick={() => sendCrewAction({ kind: 'ELEC_APU_GEN', on: true })}>
+          APU GEN ON
         </button>
         <button onClick={() => sendCrewAction({ kind: 'ECAM_ACK_LINE' })}>
           ECAM ACTIONS — OVERFLY LINE

@@ -70,6 +70,42 @@ export interface Kinematics {
   bank: number;
 }
 
+// ─────────────────────────────────────────────────────────────────────────
+// Electrical (ATA 24) — Stage 6. Conditions on the SOURCES; bus powering and
+// reconfiguration (bus tie, RAT/emer config) are DERIVED, never authored.
+// ─────────────────────────────────────────────────────────────────────────
+
+export interface GenState {
+  /** Generator pushbutton ON (i.e. not manually selected off). */
+  on: boolean;
+  /** Generator faulted (tripped offline). */
+  fault: boolean;
+}
+
+export interface ElecState {
+  // Sources (conditions, owned by event apply)
+  gen1: GenState;
+  gen2: GenState;
+  apuGen: { on: boolean; available: boolean };
+  extPwr: { on: boolean; available: boolean };
+  bat1: { on: boolean };
+  bat2: { on: boolean };
+
+  // Derived network state (owned by systems derivation only)
+  acBus1: boolean;
+  acBus2: boolean;
+  acEss: boolean;
+  tr1: boolean;
+  tr2: boolean;
+  dcBus1: boolean;
+  dcBus2: boolean;
+  dcBat: boolean;
+  dcEss: boolean;
+  busTie: boolean; // cross-feed contactor closed (auto-reconfig)
+  ratDeployed: boolean; // RAT out (auto-reconfig)
+  emerConfig: boolean; // electrical emergency configuration
+}
+
 export interface PressState {
   cabinAltFt: number;
   cabinVsFpm: number;
@@ -137,6 +173,10 @@ export type ActiveFailure =
   | { kind: 'HYD_LEAK'; circuit: HydCircuit; reservoirDrainFracPerMin: number }
   | { kind: 'HYD_PUMP_LOPR'; circuit: HydCircuit }
   | { kind: 'HYD_PTU_FAULT' }
+  // ATA 24 — Electrical
+  | { kind: 'ELEC_GEN_FAULT'; gen: 1 | 2 }
+  | { kind: 'ELEC_AC_BUS_FAULT'; bus: 1 | 2 }
+  | { kind: 'ELEC_TR_FAULT'; tr: 1 | 2 }
   // ATA 21 — Pressurisation
   | { kind: 'RAPID_DEPRESS'; cabinClimbFpm: number }
   // ATA 70 — Powerplant
@@ -151,6 +191,8 @@ export type FailureKind = ActiveFailure['kind'];
 export type CrewAction =
   | { kind: 'HYD_PUMP'; sys: HydCircuit; on: boolean }
   | { kind: 'PTU_ARM'; armed: boolean }
+  | { kind: 'ELEC_GEN'; gen: 1 | 2; on: boolean }
+  | { kind: 'ELEC_APU_GEN'; on: boolean }
   | { kind: 'ECAM_CLR' }
   | { kind: 'ECAM_RECALL' }
   /** Acknowledge/overfly the next MANUAL action line of the top ECAM procedure. */
@@ -262,6 +304,7 @@ export interface AircraftState {
   press: PressState;
   engines: EngineState[];
   hyd: HydraulicsState;
+  elec: ElecState;
   config: ConfigState;
   fcu: FcuState;
   o2: { crewMin: number; paxMin: number };

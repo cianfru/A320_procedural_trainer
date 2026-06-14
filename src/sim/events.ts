@@ -50,6 +50,18 @@ function applyCrewAction(state: AircraftState, action: CrewAction): void {
     case 'ECAM_ACK_LINE':
       ackTopManualLine(state);
       break;
+    case 'ELEC_GEN': {
+      const gen = action.gen === 1 ? state.elec.gen1 : state.elec.gen2;
+      gen.on = action.on;
+      // Cycling the pushbutton back ON clears a recoverable fault; a hard
+      // failure in failures[] re-faults it on the next event. (Reset attempt.)
+      if (action.on) gen.fault = false;
+      break;
+    }
+    case 'ELEC_APU_GEN':
+      state.elec.apuGen.on = action.on;
+      state.elec.apuGen.available = action.on;
+      break;
     case 'FCU_SET': {
       const fcu = state.fcu;
       fcu[action.field] += action.delta;
@@ -134,8 +146,14 @@ function applyFailure(state: AircraftState, failure: ActiveFailure): void {
     case 'ENG_FIRE':
       state.engines[failure.engine - 1].running = false;
       break;
-    // HYD_LEAK and RAPID_DEPRESS carry rates consumed by the integrator;
-    // nothing discrete to set at injection time.
+    case 'ELEC_GEN_FAULT':
+      // Generator trips offline. Derivation drops the bus; FWC raises the fault.
+      (failure.gen === 1 ? state.elec.gen1 : state.elec.gen2).fault = true;
+      break;
+    // AC_BUS / TR faults are read from failures[] by derivation; nothing to set.
+    // HYD_LEAK and RAPID_DEPRESS carry rates consumed by the integrator.
+    case 'ELEC_AC_BUS_FAULT':
+    case 'ELEC_TR_FAULT':
     case 'HYD_LEAK':
     case 'RAPID_DEPRESS':
       break;
@@ -147,6 +165,9 @@ function sameFailure(a: ActiveFailure, b: ActiveFailure): boolean {
   if (a.kind !== b.kind) return false;
   if ('circuit' in a && 'circuit' in b) return a.circuit === b.circuit;
   if (a.kind === 'ENG_FIRE' && b.kind === 'ENG_FIRE') return a.engine === b.engine;
+  if (a.kind === 'ELEC_GEN_FAULT' && b.kind === 'ELEC_GEN_FAULT') return a.gen === b.gen;
+  if (a.kind === 'ELEC_AC_BUS_FAULT' && b.kind === 'ELEC_AC_BUS_FAULT') return a.bus === b.bus;
+  if (a.kind === 'ELEC_TR_FAULT' && b.kind === 'ELEC_TR_FAULT') return a.tr === b.tr;
   return true;
 }
 

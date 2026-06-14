@@ -2,24 +2,89 @@ import { useSimStore } from '../store/useSimStore';
 import { DisplayUnit } from './DisplayUnit';
 import { EIS } from './glass';
 import { HYD } from '../sim/constants';
-import type { HydSys, HydraulicsState } from '../sim/types';
+import type { ElecState, HydSys, HydraulicsState } from '../sim/types';
 
 /**
- * Lower SD (system display). Auto-called page follows fwc.sdPage. The HYD
- * synoptic is drawn; remaining pages are placeholders pending their system
+ * Lower SD (system display). Auto-called page follows fwc.sdPage. HYD and ELEC
+ * synoptics are drawn; remaining pages are placeholders pending their system
  * models + mockups.
  */
 export function SD() {
   const page = useSimStore((s) => s.state.fwc.sdPage);
   const hyd = useSimStore((s) => s.state.hyd);
+  const elec = useSimStore((s) => s.state.elec);
 
   return (
     <DisplayUnit label={`SD ${page}`}>
       <text x={256} y={26} fill={EIS.white} fontSize={16} textAnchor="middle">
-        {page === 'HYD' ? 'HYD' : page}
+        {page}
       </text>
-      {page === 'HYD' ? <HydSynoptic hyd={hyd} /> : <Placeholder page={page} />}
+      {page === 'HYD' ? (
+        <HydSynoptic hyd={hyd} />
+      ) : page === 'ELEC' ? (
+        <ElecSynoptic elec={elec} />
+      ) : (
+        <Placeholder page={page} />
+      )}
     </DisplayUnit>
+  );
+}
+
+// ── ELEC synoptic ────────────────────────────────────────────────────────
+function ElecSynoptic({ elec }: { elec: ElecState }) {
+  return (
+    <>
+      {elec.emerConfig && (
+        <text x={256} y={48} fill={EIS.red} fontSize={16} fontWeight={700} textAnchor="middle">
+          EMER CONFIG
+        </text>
+      )}
+      {/* generators */}
+      <PwrBox x={70} y={70} label="GEN 1" on={elec.gen1.on && !elec.gen1.fault} />
+      <PwrBox x={290} y={70} label="GEN 2" on={elec.gen2.on && !elec.gen2.fault} />
+      <PwrBox x={180} y={70} label="APU GEN" on={elec.apuGen.on && elec.apuGen.available} dim />
+
+      {/* AC busses */}
+      <PwrBox x={70} y={150} label="AC 1" on={elec.acBus1} />
+      <PwrBox x={290} y={150} label="AC 2" on={elec.acBus2} />
+      <PwrBox x={180} y={150} label="AC ESS" on={elec.acEss} />
+      {/* bus tie link */}
+      <line x1={150} y1={166} x2={290} y2={166} stroke={elec.busTie ? EIS.green : EIS.greyDark} strokeWidth={2} strokeDasharray={elec.busTie ? '0' : '4 5'} />
+
+      {/* TRs */}
+      <PwrBox x={70} y={230} label="TR 1" on={elec.tr1} />
+      <PwrBox x={290} y={230} label="TR 2" on={elec.tr2} />
+
+      {/* DC busses */}
+      <PwrBox x={70} y={310} label="DC 1" on={elec.dcBus1} />
+      <PwrBox x={290} y={310} label="DC 2" on={elec.dcBus2} />
+      <PwrBox x={180} y={310} label="DC ESS" on={elec.dcEss} />
+      <PwrBox x={180} y={385} label="DC BAT" on={elec.dcBat} />
+
+      {/* batteries */}
+      <PwrBox x={70} y={385} label="BAT 1" on={elec.bat1.on} />
+      <PwrBox x={290} y={385} label="BAT 2" on={elec.bat2.on} />
+
+      {/* RAT */}
+      <text x={420} y={170} fill={elec.ratDeployed ? EIS.green : EIS.greyDark} fontSize={13} textAnchor="middle">
+        RAT
+      </text>
+      <text x={420} y={186} fill={elec.ratDeployed ? EIS.green : EIS.greyDark} fontSize={12} textAnchor="middle">
+        {elec.ratDeployed ? 'OUT' : 'STOW'}
+      </text>
+    </>
+  );
+}
+
+function PwrBox({ x, y, label, on, dim }: { x: number; y: number; label: string; on: boolean; dim?: boolean }) {
+  const c = on ? EIS.green : EIS.amber;
+  return (
+    <g opacity={dim && !on ? 0.5 : 1}>
+      <rect x={x} y={y} width={80} height={32} rx={2} fill="none" stroke={c} strokeWidth={1.5} />
+      <text x={x + 40} y={y + 21} fill={c} fontSize={14} textAnchor="middle">
+        {label}
+      </text>
+    </g>
   );
 }
 

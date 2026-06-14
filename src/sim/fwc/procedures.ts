@@ -55,11 +55,66 @@ const hydPtuFault: EcamProcedure = {
   ],
 };
 
+// ── ELEC (ATA 24) ──────────────────────────────────────────────────────────
+/** ELEC GEN n FAULT procedure. */
+function elecGenFault(gen: 1 | 2): EcamProcedure {
+  return {
+    itemId: `ELEC_GEN_${gen}_FAULT`,
+    lines: [
+      { id: `gen${gen}_offon`, text: `GEN ${gen} .......... OFF then ON`, type: 'MANUAL' },
+      {
+        id: `gen${gen}_off`,
+        text: `GEN ${gen} .......... OFF`,
+        type: 'SENSED',
+        done: (s) => !(gen === 1 ? s.elec.gen1 : s.elec.gen2).on, // VALIDATE
+      },
+    ],
+  };
+}
+
+/** ELEC AC BUS n FAULT procedure. */
+function elecAcBusFault(bus: 1 | 2): EcamProcedure {
+  return {
+    itemId: `ELEC_AC_BUS_${bus}_FAULT`,
+    lines: [{ id: `acbus${bus}_check`, text: `AFFECTED SYS .......... CHECK`, type: 'MANUAL' }],
+  };
+}
+
+/** ELEC TR n FAULT procedure. */
+function elecTrFault(tr: 1 | 2): EcamProcedure {
+  return {
+    itemId: `ELEC_TR_${tr}_FAULT`,
+    lines: [{ id: `tr${tr}_monitor`, text: `AFFECTED SYS .......... MONITOR`, type: 'MANUAL' }],
+  };
+}
+
+/** ELEC EMER CONFIG (memory items + actions). */
+const elecEmerConfig: EcamProcedure = {
+  itemId: 'ELEC_EMER_CONFIG',
+  lines: [
+    { id: 'emer_man_on', text: `EMER ELEC PWR (MAN ON) .... ON`, type: 'MANUAL' },
+    {
+      id: 'emer_rat_out',
+      text: `RAT .......... OUT`,
+      type: 'SENSED',
+      done: (s) => s.elec.ratDeployed, // auto-deploys in emer config
+    },
+    { id: 'emer_gens', text: `GEN 1 + 2 .......... OFF then ON`, type: 'MANUAL' },
+  ],
+};
+
 const ALL: EcamProcedure[] = [
   hydSysLoPr('green'),
   hydSysLoPr('blue'),
   hydSysLoPr('yellow'),
   hydPtuFault,
+  elecGenFault(1),
+  elecGenFault(2),
+  elecAcBusFault(1),
+  elecAcBusFault(2),
+  elecTrFault(1),
+  elecTrFault(2),
+  elecEmerConfig,
 ];
 
 export const PROCEDURES: Record<string, EcamProcedure> = Object.fromEntries(

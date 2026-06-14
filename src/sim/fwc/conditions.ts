@@ -82,4 +82,41 @@ export const CONDITIONS: FwcCondition[] = [
     },
     present: (s) => s.failures.some((f) => f.kind === 'ENG_FIRE' && f.engine === 2),
   },
+
+  // ── ELEC (ATA 24) ──────────────────────────────────────────────────────
+  {
+    item: { id: 'ELEC_EMER_CONFIG', color: 'WARNING', title: 'ELEC EMER CONFIG', sdPage: 'ELEC' },
+    present: (s) => s.elec.emerConfig,
+  },
+  {
+    item: { id: 'ELEC_GEN_1_FAULT', color: 'CAUTION', title: 'ELEC GEN 1 FAULT', sdPage: 'ELEC' },
+    // GEN 1 not supplying while ENG 1 is running (and not already in emer config).
+    present: (s) =>
+      !s.elec.emerConfig &&
+      (s.engines[0]?.running ?? false) &&
+      (!s.elec.gen1.on || s.elec.gen1.fault),
+  },
+  {
+    item: { id: 'ELEC_GEN_2_FAULT', color: 'CAUTION', title: 'ELEC GEN 2 FAULT', sdPage: 'ELEC' },
+    present: (s) =>
+      !s.elec.emerConfig &&
+      (s.engines[1]?.running ?? false) &&
+      (!s.elec.gen2.on || s.elec.gen2.fault),
+  },
+  {
+    item: { id: 'ELEC_AC_BUS_1_FAULT', color: 'CAUTION', title: 'ELEC AC BUS 1 FAULT', sdPage: 'ELEC' },
+    present: (s) => !s.elec.emerConfig && !s.elec.acBus1,
+  },
+  {
+    item: { id: 'ELEC_AC_BUS_2_FAULT', color: 'CAUTION', title: 'ELEC AC BUS 2 FAULT', sdPage: 'ELEC' },
+    present: (s) => !s.elec.emerConfig && !s.elec.acBus2,
+  },
+  {
+    item: { id: 'ELEC_TR_1_FAULT', color: 'CAUTION', title: 'ELEC TR 1 FAULT', sdPage: 'ELEC' },
+    present: (s) => !s.elec.emerConfig && !s.elec.tr1,
+  },
+  {
+    item: { id: 'ELEC_TR_2_FAULT', color: 'CAUTION', title: 'ELEC TR 2 FAULT', sdPage: 'ELEC' },
+    present: (s) => !s.elec.emerConfig && !s.elec.tr2,
+  },
 ];
