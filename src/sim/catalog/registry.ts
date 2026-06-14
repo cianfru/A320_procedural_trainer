@@ -110,14 +110,76 @@ export const FAILURE_CATALOG: FailureCatalogEntry[] = [
     build: () => ({ kind: 'ENG_FIRE', engine: 2 }),
   },
 
-  // ── BACKLOG (planned — catalogued, not yet coded) ───────────────────────
-  // ATA 24 — ELECTRICAL
-  planned('ELEC_GEN_1_FAULT', '24', 'ELEC', 'ELEC: GEN 1 FAULT', ['ELEC_GEN_1_FAULT']),
-  planned('ELEC_GEN_2_FAULT', '24', 'ELEC', 'ELEC: GEN 2 FAULT', ['ELEC_GEN_2_FAULT']),
-  planned('ELEC_AC_BUS_1_FAULT', '24', 'ELEC', 'ELEC: AC BUS 1 FAULT', ['ELEC_AC_BUS_1_FAULT']),
+  // ── ATA 24 — ELECTRICAL (implemented: the bus-loss reconfiguration family) ─
+  {
+    id: 'ELEC_GEN_1_FAULT',
+    ata: '24',
+    system: 'ELEC',
+    title: 'ELEC: GEN 1 FAULT',
+    status: 'implemented',
+    raises: ['ELEC_GEN_1_FAULT'],
+    refs: { fcom: 'FCOM 1.24', fbw: 'A32NX electrical' },
+    build: () => ({ kind: 'ELEC_GEN_FAULT', gen: 1 }),
+  },
+  {
+    id: 'ELEC_GEN_2_FAULT',
+    ata: '24',
+    system: 'ELEC',
+    title: 'ELEC: GEN 2 FAULT',
+    status: 'implemented',
+    raises: ['ELEC_GEN_2_FAULT'],
+    build: () => ({ kind: 'ELEC_GEN_FAULT', gen: 2 }),
+  },
+  {
+    id: 'ELEC_AC_BUS_1_FAULT',
+    ata: '24',
+    system: 'ELEC',
+    title: 'ELEC: AC BUS 1 FAULT',
+    status: 'implemented',
+    raises: ['ELEC_AC_BUS_1_FAULT'],
+    build: () => ({ kind: 'ELEC_AC_BUS_FAULT', bus: 1 }),
+  },
+  {
+    id: 'ELEC_AC_BUS_2_FAULT',
+    ata: '24',
+    system: 'ELEC',
+    title: 'ELEC: AC BUS 2 FAULT',
+    status: 'implemented',
+    raises: ['ELEC_AC_BUS_2_FAULT'],
+    build: () => ({ kind: 'ELEC_AC_BUS_FAULT', bus: 2 }),
+  },
+  {
+    id: 'ELEC_TR_1_FAULT',
+    ata: '24',
+    system: 'ELEC',
+    title: 'ELEC: TR 1 FAULT',
+    status: 'implemented',
+    raises: ['ELEC_TR_1_FAULT'],
+    build: () => ({ kind: 'ELEC_TR_FAULT', tr: 1 }),
+  },
+  {
+    id: 'ELEC_TR_2_FAULT',
+    ata: '24',
+    system: 'ELEC',
+    title: 'ELEC: TR 2 FAULT',
+    status: 'implemented',
+    raises: ['ELEC_TR_2_FAULT'],
+    build: () => ({ kind: 'ELEC_TR_FAULT', tr: 2 }),
+  },
+  {
+    id: 'ELEC_EMER_CONFIG',
+    ata: '24',
+    system: 'ELEC',
+    title: 'ELEC: EMER CONFIG (DUAL GEN)',
+    status: 'implemented',
+    raises: ['ELEC_EMER_CONFIG'],
+    validate: 'RAT deploy also needs sufficient airspeed; not modelled yet.',
+    // Trip GEN 2 here; pair with GEN 1 FAULT to enter EMER CONFIG (both AC lost).
+    build: () => ({ kind: 'ELEC_GEN_FAULT', gen: 2 }),
+  },
+
+  // ── ELEC backlog (planned) ──────────────────────────────────────────────
   planned('ELEC_DC_BUS_1_FAULT', '24', 'ELEC', 'ELEC: DC BUS 1 FAULT', ['ELEC_DC_BUS_1_FAULT']),
-  planned('ELEC_EMER_CONFIG', '24', 'ELEC', 'ELEC: EMER CONFIG', ['ELEC_EMER_CONFIG']),
-  planned('ELEC_TR_1_FAULT', '24', 'ELEC', 'ELEC: TR 1 FAULT', ['ELEC_TR_1_FAULT']),
   planned('ELEC_BAT_1_FAULT', '24', 'ELEC', 'ELEC: BAT 1 FAULT', ['ELEC_BAT_1_FAULT']),
 
   // ATA 36 — BLEED AIR

@@ -1,5 +1,6 @@
 import type { AircraftState } from '../types';
 import { deriveHydraulics } from './hydraulics';
+import { deriveElectrical } from './electrical';
 
 /**
  * Systems derivation — tick step 3 (spec §2.1).
@@ -19,7 +20,12 @@ export function deriveSystems(state: AircraftState): void {
   state.hyd.blue.pressurePsi = hyd.bluePsi;
   state.hyd.yellow.pressurePsi = hyd.yellowPsi;
   state.hyd.ptu.running = hyd.ptuRunning;
+
+  const elec = deriveElectrical(state);
+  Object.assign(state.elec, elec);
 }
 
 export { deriveHydraulics } from './hydraulics';
 export type { HydDerivation } from './hydraulics';
+export { deriveElectrical } from './electrical';
+export type { ElecDerivation } from './electrical';
