@@ -91,6 +91,24 @@ export function ControlPanel() {
           </button>
         </div>
       </div>
+
+      <div className="cp-section">
+        <h3>EMER DESCENT</h3>
+        <button onClick={() => sendCrewAction({ kind: 'CREW_OXY', on: true })}>
+          CREW OXY MASKS
+        </button>
+        <button onClick={() => sendCrewAction({ kind: 'SIGNS_ON' })}>SIGNS ON</button>
+        <button onClick={() => sendCrewAction({ kind: 'SET_VS', fpm: -6000 })}>
+          INITIATE DESCENT
+        </button>
+        <button onClick={() => sendCrewAction({ kind: 'THR_IDLE' })}>THR IDLE</button>
+        <button onClick={() => sendCrewAction({ kind: 'SPEEDBRAKE', value: 1 })}>
+          SPD BRK FULL
+        </button>
+        <button onClick={() => sendCrewAction({ kind: 'ENG_MODE_IGN', on: true })}>
+          ENG MODE IGN
+        </button>
+      </div>
     </div>
   );
 }

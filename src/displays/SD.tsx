@@ -1,18 +1,19 @@
 import { useSimStore } from '../store/useSimStore';
 import { DisplayUnit } from './DisplayUnit';
 import { EIS } from './glass';
-import { HYD } from '../sim/constants';
-import type { ElecState, HydSys, HydraulicsState } from '../sim/types';
+import { HYD, PRESS } from '../sim/constants';
+import type { ElecState, HydSys, HydraulicsState, PressState } from '../sim/types';
 
 /**
- * Lower SD (system display). Auto-called page follows fwc.sdPage. HYD and ELEC
- * synoptics are drawn; remaining pages are placeholders pending their system
- * models + mockups.
+ * Lower SD (system display). Auto-called page follows fwc.sdPage. HYD, ELEC and
+ * PRESS synoptics are drawn; remaining pages are placeholders pending their
+ * system models + mockups.
  */
 export function SD() {
   const page = useSimStore((s) => s.state.fwc.sdPage);
   const hyd = useSimStore((s) => s.state.hyd);
   const elec = useSimStore((s) => s.state.elec);
+  const press = useSimStore((s) => s.state.press);
 
   return (
     <DisplayUnit label={`SD ${page}`}>
@@ -23,10 +24,51 @@ export function SD() {
         <HydSynoptic hyd={hyd} />
       ) : page === 'ELEC' ? (
         <ElecSynoptic elec={elec} />
+      ) : page === 'PRESS' ? (
+        <PressSynoptic press={press} />
       ) : (
         <Placeholder page={page} />
       )}
     </DisplayUnit>
+  );
+}
+
+// ── PRESS synoptic ─────────────────────────────────────────────────────────
+function PressSynoptic({ press }: { press: PressState }) {
+  const alt = press.cabinAltFt;
+  const altColor =
+    alt >= PRESS.EXCESS_CAB_ALT_FT ? EIS.red : alt >= PRESS.CAB_ALT_PULSE_FT ? EIS.amber : EIS.green;
+  const dpColor = press.diffPsi < -0.4 || press.diffPsi >= 8.5 ? EIS.amber : EIS.green;
+  return (
+    <>
+      <Readout x={140} y={120} label="ΔP" unit="PSI" value={press.diffPsi.toFixed(1)} color={dpColor} />
+      <Readout x={372} y={120} label="CAB ALT" unit="FT" value={String(Math.round(alt / 50) * 50)} color={altColor} />
+      <Readout x={256} y={200} label="CAB V/S" unit="FT/MN" value={String(Math.round(press.cabinVsFpm / 50) * 50)} color={Math.abs(press.cabinVsFpm) > 1750 ? EIS.amber : EIS.green} />
+
+      <PwrBox x={120} y={280} label="PACK 1" on={press.pack1} />
+      <PwrBox x={300} y={280} label="PACK 2" on={press.pack2} />
+
+      {press.paxMasksDeployed && (
+        <text x={256} y={360} fill={EIS.amber} fontSize={15} fontWeight={700} textAnchor="middle">
+          PAX OXY MASKS DEPLOYED
+        </text>
+      )}
+      {alt >= PRESS.EXCESS_CAB_ALT_FT && (
+        <text x={256} y={400} fill={EIS.red} fontSize={16} fontWeight={700} textAnchor="middle">
+          EXCESS CAB ALT
+        </text>
+      )}
+    </>
+  );
+}
+
+function Readout({ x, y, label, unit, value, color }: { x: number; y: number; label: string; unit: string; value: string; color: string }) {
+  return (
+    <g textAnchor="middle">
+      <text x={x} y={y - 22} fill={EIS.white} fontSize={13}>{label}</text>
+      <text x={x} y={y + 6} fill={color} fontSize={26}>{value}</text>
+      <text x={x} y={y + 24} fill={EIS.cyan} fontSize={11}>{unit}</text>
+    </g>
   );
 }
 

@@ -65,6 +65,28 @@ export const CONDITIONS: FwcCondition[] = [
     present: (s) => s.press.cabinAltFt > PRESS.EXCESS_CAB_ALT_FT,
   },
   {
+    item: { id: 'CAB_PR_LO_DIFF_PR', color: 'CAUTION', title: 'CAB PR LO DIFF PR', sdPage: 'PRESS' },
+    // Low cabin/ambient differential while at altitude (not on the ground).
+    present: (s) =>
+      s.kinematics.altFt > 10000 && s.press.diffPsi < PRESS.LO_DIFF_PR_PSI,
+  },
+  {
+    item: { id: 'AIR_PACK_1_FAULT', color: 'CAUTION', title: 'AIR PACK 1 FAULT', sdPage: 'BLEED' },
+    present: (s) => !s.press.pack1,
+  },
+  {
+    item: { id: 'AIR_PACK_2_FAULT', color: 'CAUTION', title: 'AIR PACK 2 FAULT', sdPage: 'BLEED' },
+    present: (s) => !s.press.pack2,
+  },
+  {
+    item: { id: 'CAB_PR_SYS_1_2_FAULT', color: 'CAUTION', title: 'CAB PR SYS 1+2 FAULT', sdPage: 'PRESS' },
+    present: (s) => {
+      const f1 = s.failures.some((f) => f.kind === 'CAB_PR_SYS_FAULT' && f.sys === 1);
+      const f2 = s.failures.some((f) => f.kind === 'CAB_PR_SYS_FAULT' && f.sys === 2);
+      return f1 && f2;
+    },
+  },
+  {
     item: {
       id: 'ENG1_FIRE',
       color: 'WARNING',

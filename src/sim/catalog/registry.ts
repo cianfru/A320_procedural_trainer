@@ -76,17 +76,53 @@ export const FAILURE_CATALOG: FailureCatalogEntry[] = [
     build: () => ({ kind: 'HYD_PTU_FAULT' }),
   },
 
-  // ── ATA 21 — PRESSURISATION (partial — dynamic family, Stage 3) ─────────
+  // ── ATA 21 — AIR / PRESSURISATION (the dynamic family — Stage 3) ────────
   {
     id: 'PRESS_RAPID_DEPRESS',
     ata: '21',
     system: 'PRESS',
     title: 'PRESS: RAPID DEPRESSURISATION',
-    status: 'partial',
+    status: 'implemented',
     raises: ['EXCESS_CAB_ALT'],
-    validate: 'EXCESS CAB ALT trigger ~9,550 ft — confirm. Procedure: Stage 3.',
-    refs: { qrh: 'QRH EMER DESCENT' },
+    refs: { qrh: 'QRH EMER DESCENT', fbw: 'EXCESSIVE_ALT_WARNING=9550' },
     build: (p) => ({ kind: 'RAPID_DEPRESS', cabinClimbFpm: p?.rate ?? 6000 }),
+  },
+  {
+    id: 'AIR_PACK_1_FAULT',
+    ata: '21',
+    system: 'AIR',
+    title: 'AIR: PACK 1 FAULT',
+    status: 'implemented',
+    raises: ['AIR_PACK_1_FAULT'],
+    build: () => ({ kind: 'AIR_PACK_FAULT', pack: 1 }),
+  },
+  {
+    id: 'AIR_PACK_2_FAULT',
+    ata: '21',
+    system: 'AIR',
+    title: 'AIR: PACK 2 FAULT',
+    status: 'implemented',
+    raises: ['AIR_PACK_2_FAULT'],
+    build: () => ({ kind: 'AIR_PACK_FAULT', pack: 2 }),
+  },
+  {
+    id: 'CAB_PR_SYS_1_FAULT',
+    ata: '21',
+    system: 'PRESS',
+    title: 'PRESS: CAB PR SYS 1 FAULT',
+    status: 'partial',
+    raises: ['CAB_PR_SYS_1_2_FAULT'],
+    validate: 'Single-CPC fault auto-transfers; pair with SYS 2 for SYS 1+2 FAULT.',
+    build: () => ({ kind: 'CAB_PR_SYS_FAULT', sys: 1 }),
+  },
+  {
+    id: 'CAB_PR_SYS_2_FAULT',
+    ata: '21',
+    system: 'PRESS',
+    title: 'PRESS: CAB PR SYS 2 FAULT',
+    status: 'partial',
+    raises: ['CAB_PR_SYS_1_2_FAULT'],
+    build: () => ({ kind: 'CAB_PR_SYS_FAULT', sys: 2 }),
   },
 
   // ── ATA 70-80 — POWERPLANT (partial — Stage 6/7) ────────────────────────
@@ -186,12 +222,6 @@ export const FAILURE_CATALOG: FailureCatalogEntry[] = [
   planned('BLEED_ENG_1_FAULT', '36', 'BLEED', 'BLEED: ENG 1 BLEED FAULT', ['BLEED_ENG_1_FAULT']),
   planned('BLEED_APU_FAULT', '36', 'BLEED', 'BLEED: APU BLEED FAULT', ['BLEED_APU_FAULT']),
   planned('BLEED_HI_TEMP', '36', 'BLEED', 'BLEED: HI TEMP', ['BLEED_HI_TEMP']),
-
-  // ATA 21 — AIR CONDITIONING / PRESS (further)
-  planned('AIR_PACK_1_FAULT', '21', 'AIR', 'AIR: PACK 1 FAULT', ['AIR_PACK_1_FAULT']),
-  planned('AIR_PACK_2_FAULT', '21', 'AIR', 'AIR: PACK 2 FAULT', ['AIR_PACK_2_FAULT']),
-  planned('PRESS_SYS_1_FAULT', '21', 'PRESS', 'PRESS: CABIN PR SYS 1 FAULT', ['PRESS_SYS_1_FAULT']),
-  planned('PRESS_LO_DIFF', '21', 'PRESS', 'PRESS: LO DIFF PR', ['PRESS_LO_DIFF']),
 
   // ATA 28 — FUEL
   planned('FUEL_L_WING_PUMP_1_LO_PR', '28', 'FUEL', 'FUEL: L WING TK PUMP 1 LO PR', ['FUEL_L_WING_PUMP_1_LO_PR']),

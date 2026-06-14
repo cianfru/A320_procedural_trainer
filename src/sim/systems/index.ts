@@ -1,6 +1,7 @@
 import type { AircraftState } from '../types';
 import { deriveHydraulics } from './hydraulics';
 import { deriveElectrical } from './electrical';
+import { deriveAir } from './air';
 
 /**
  * Systems derivation — tick step 3 (spec §2.1).
@@ -23,9 +24,16 @@ export function deriveSystems(state: AircraftState): void {
 
   const elec = deriveElectrical(state);
   Object.assign(state.elec, elec);
+
+  const air = deriveAir(state);
+  state.press.pack1 = air.pack1;
+  state.press.pack2 = air.pack2;
+  state.press.paxMasksDeployed = air.paxMasksDeployed;
 }
 
 export { deriveHydraulics } from './hydraulics';
 export type { HydDerivation } from './hydraulics';
 export { deriveElectrical } from './electrical';
 export type { ElecDerivation } from './electrical';
+export { deriveAir } from './air';
+export type { AirDerivation } from './air';

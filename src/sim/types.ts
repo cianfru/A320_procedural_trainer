@@ -112,6 +112,13 @@ export interface PressState {
   diffPsi: number;
   outflow: number;
   packFlow: 'LO' | 'NORM' | 'HI';
+  // Conditions (event-owned): pack/CPC selected on; faults live in failures[].
+  pack1On: boolean;
+  pack2On: boolean;
+  // Derived (air derivation owns): operative state + pax-mask auto-deploy.
+  pack1: boolean;
+  pack2: boolean;
+  paxMasksDeployed: boolean;
 }
 
 export interface EngineState {
@@ -131,7 +138,10 @@ export interface ConfigState {
   flaps: number;
   slats: number;
   speedbrake: number;
+  /** Crew oxygen masks in use (consumes crew O2). */
   masks: boolean;
+  /** Engine ignition selector continuous (ENG MODE SEL → IGN). */
+  engModeIgn: boolean;
   signs: { seatbelts: boolean; noSmoking: boolean };
 }
 
@@ -177,8 +187,10 @@ export type ActiveFailure =
   | { kind: 'ELEC_GEN_FAULT'; gen: 1 | 2 }
   | { kind: 'ELEC_AC_BUS_FAULT'; bus: 1 | 2 }
   | { kind: 'ELEC_TR_FAULT'; tr: 1 | 2 }
-  // ATA 21 — Pressurisation
+  // ATA 21 — Air / Pressurisation
   | { kind: 'RAPID_DEPRESS'; cabinClimbFpm: number }
+  | { kind: 'AIR_PACK_FAULT'; pack: 1 | 2 }
+  | { kind: 'CAB_PR_SYS_FAULT'; sys: 1 | 2 }
   // ATA 70 — Powerplant
   | { kind: 'ENG_FIRE'; engine: 1 | 2 };
 
@@ -199,6 +211,14 @@ export type CrewAction =
   | { kind: 'ECAM_ACK_LINE' }
   | { kind: 'MASTER_WARN_ACK' }
   | { kind: 'MASTER_CAUT_ACK' }
+  // Emergency-descent / pressurisation crew vocabulary
+  | { kind: 'SET_VS'; fpm: number } // commanded vertical speed (descent)
+  | { kind: 'THR_IDLE' }
+  | { kind: 'SPEEDBRAKE'; value: number } // 0..1
+  | { kind: 'ENG_MODE_IGN'; on: boolean }
+  | { kind: 'CREW_OXY'; on: boolean }
+  | { kind: 'SIGNS_ON' }
+  | { kind: 'AIR_PACK'; pack: 1 | 2; on: boolean }
   // FCU (glareshield)
   | { kind: 'FCU_SET'; field: FcuField; delta: number }
   | { kind: 'FCU_PUSH'; field: FcuField } // → managed (or V/S off)
