@@ -4,6 +4,7 @@ import { DisplayUnit } from './DisplayUnit';
 import { EIS } from './glass';
 import { PROCEDURES } from '../sim/fwc/procedures';
 import { activeLineId } from '../sim/fwc/ecamActions';
+import { ENG } from '../sim/constants';
 import type { EcamColor, EngineState, FwcState } from '../sim/types';
 
 /**
@@ -62,8 +63,8 @@ function EngineColumn({ eng, cx, idx }: { eng: EngineState; cx: number; idx: num
       <text x={cx} y={20} fill={EIS.white} fontSize={13} textAnchor="middle">
         ENG {idx}
       </text>
-      <Gauge cx={cx} cy={92} r={50} min={0} max={110} redline={104} value={eng.n1} label="N1" />
-      <Gauge cx={cx} cy={196} r={40} min={0} max={1000} redline={950} value={eng.egt} label="EGT" />
+      <Gauge cx={cx} cy={92} r={50} min={0} max={110} redline={ENG.N1_MAX_PCT} value={eng.n1} label="N1" />
+      <Gauge cx={cx} cy={196} r={40} min={0} max={1100} redline={ENG.EGT_TO_MAX_C} value={eng.egt} label="EGT" />
       <Digital cx={cx} y={244} label="N2" value={Math.round(eng.n2)} />
       <Digital cx={cx} y={256} label="FF" value={Math.round(eng.ff)} />
     </g>

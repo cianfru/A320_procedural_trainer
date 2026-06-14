@@ -13,20 +13,23 @@
  * VALIDATE: exact hues are tuned to look right on screen; refine against
  * flight-deck mockups (clean-room: match appearance, don't copy assets).
  */
+// Exact FlyByWire A32NX EIS hex values (definitions.scss / PFD style.scss) —
+// see docs/research/A320_SYSTEMS_REFERENCE.md §2.
 export const EIS = {
-  green: '#0fd80f',
-  cyan: '#00e5ff',
-  amber: '#ffae00',
-  red: '#ff2424',
-  magenta: '#ff4fff',
+  green: '#00ff00',
+  cyan: '#00ffff',
+  amber: '#e68000',
+  red: '#ff0000',
+  magenta: '#ff94ff',
   white: '#ffffff',
+  yellow: '#ffff00', // aircraft reference / trend / slip
   grey: '#9aa3ab',
   greyDark: '#4a525a',
   // PFD attitude sphere
-  sky: '#1a7fc4',
-  ground: '#8a6726',
+  sky: '#0698ff',
+  ground: '#9c480c',
   // DU background
-  bg: '#000000',
+  bg: '#040404',
   tape: '#1c1f24',
   tapeEdge: '#3a414a',
 } as const;
